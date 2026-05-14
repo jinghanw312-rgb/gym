@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 3. Primitive Definitions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 2. Validation Blueprints
+    function isValidSportsLog(data) {
+      return data.timestamp is timestamp
+          && data.category is string && data.category.size() <= 100
+          && data.name is string && data.name.size() <= 100
+          && (data.value == null || data.value is number)
+          && (data.kcal == null || data.kcal is number)
+          && (data.score == null || data.score is string)
+          && data.userId is string && data.userId == request.auth.uid;
+    }
+
+    function isValidChatMessage(data) {
+      return data.userId is string && data.userId == request.auth.uid
+          && data.role in ['user', 'assistant']
+          && data.content is string && data.content.size() <= 5000
+          && data.timestamp is timestamp;
+    }
+
+    // 1. Master Gate
+    
+    // User Profile & Private Data
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      
+      match /chatHistory/{messageId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(messageId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId)
+                      && isValidChatMessage(incoming())
+                      && incoming().timestamp == request.time;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(messageId);
+      }
+    }
+
+    match /sportsLogs/{logId} {
+      allow get: if isSignedIn() && isOwner(existing().userId) && isValidId(logId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      allow create: if isSignedIn() 
+                    && isValidSportsLog(incoming())
+                    && incoming().timestamp == request.time;
+
+      allow update: if isOwner(existing().userId)
+                    && isValidSportsLog(incoming())
+                    && incoming().userId == existing().userId
+                    && incoming().timestamp == existing().timestamp
+                    && (
+                      incoming().diff(existing()).affectedKeys().hasOnly(['category', 'name', 'value', 'kcal', 'score'])
+                    );
+
+      allow delete: if isOwner(existing().userId) && isValidId(logId);
+    }
+  }
+}

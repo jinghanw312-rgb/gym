@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "SportsLog": {
+      "title": "Sports Activity Log",
+      "description": "Records of individual sports activities including metrics and performance stats.",
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the activity was recorded"
+        },
+        "category": {
+          "type": "string",
+          "description": "Activity category (e.g., Running, Gym)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Specific exercise name"
+        },
+        "value": {
+          "type": "number",
+          "description": "Primary measurement value (e.g., duration, reps)"
+        },
+        "kcal": {
+          "type": "number",
+          "description": "Calories burned"
+        },
+        "score": {
+          "type": "string",
+          "description": "Score or ranking result"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Unique identifier of the user who performed the activity"
+        }
+      },
+      "required": ["timestamp", "category", "name", "userId"]
+    },
+    "ChatMessage": {
+      "title": "Chat Message",
+      "description": "A single message in a chat conversation between the user and the AI.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user this message belongs to."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["user", "assistant"],
+          "description": "The role of the message author."
+        },
+        "content": {
+          "type": "string",
+          "description": "The text content of the message."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the message was sent."
+        }
+      },
+      "required": ["userId", "role", "content", "timestamp"]
+    }
+  },
+  "firestore": {
+    "sportsLogs/{logId}": {
+      "schema": "SportsLog",
+      "description": "Collection of all sports activity logs recorded in the system."
+    },
+    "users/{userId}/chatHistory/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "User-specific chat history with the AI assistant."
+    }
+  }
+}
