@@ -6,57 +6,60 @@ import { useLanguage } from '../context/LanguageContext';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-const ALL_CLASSES = {
-  morning: [
-    { time: '07:00 - 08:00', title: '早安戰鬥營', instructor: 'Pohong', tag: 'High Intensity', color: 'orange', description: '專為晨型人設計的高強度訓練，結合間歇運動與自重訓練，快速啟動一整天的代謝。', capacity: '15人', level: '進階' },
-    { time: '07:30 - 08:30', title: '晨間流動瑜珈', instructor: 'Yushan', tag: 'Relaxation', color: 'cyan', description: '溫和地喚醒身體，透過呼吸與流動的動作，為一天注入平靜與活力。', capacity: '18人', level: '各等級皆可' },
-    { time: '08:00 - 09:00', title: '核心強化基礎', instructor: 'Heyitsxyc', tag: 'Core', color: 'purple', description: '專注於深層核心肌群的穩定與訓練，改善姿勢並提升身體機能。', capacity: '20人', level: '各等級皆可' }
+const SCHEDULE_DATA: Record<string, any[]> = {
+  Mon: [
+    { time: '07:30 - 08:30', titleKey: 'schedule.morning_flow', instructor: 'Yushan', tagKey: 'schedule.tag_relaxation', color: 'cyan', capacity: '18', levelKey: 'schedule.level_all' },
+    { time: '12:00 - 13:00', titleKey: 'schedule.spinning', instructor: 'Leo', tagKey: 'schedule.tag_cardio', color: 'pink', capacity: '12', levelKey: 'schedule.level_intermediate' },
+    { time: '18:30 - 19:30', titleKey: 'schedule.mma', instructor: 'Pohong', tagKey: 'schedule.tag_combat', color: 'red', capacity: '10', levelKey: 'schedule.level_advanced' },
+    { time: '19:30 - 20:30', titleKey: 'schedule.trx', instructor: 'Yushan', tagKey: 'schedule.tag_strength', color: 'orange', capacity: '12', levelKey: 'schedule.level_intermediate' },
+    { time: '20:30 - 21:30', titleKey: 'schedule.foam_roll', instructor: 'Leo', tagKey: 'schedule.tag_recovery', color: 'cyan', capacity: '22', levelKey: 'schedule.level_all' }
   ],
-  noon: [
-    { time: '12:00 - 13:00', title: '極速飛輪', instructor: 'Yushan', tag: 'Cardio', color: 'pink', description: '跟著節奏跳動，在高強度的踩踏中燃燒脂肪，提升心肺功能與腿部耐力。', capacity: '12人', level: '中階' },
-    { time: '12:15 - 13:15', title: '午間肌力強化', instructor: 'Heyitsxyc', tag: 'Strength', color: 'orange', description: '針對核心與大肌群進行針對性訓練，適合利用午休時間提升代謝與力量。', capacity: '15人', level: '中階' }
+  Tue: [
+    { time: '07:00 - 08:00', titleKey: 'schedule.bootcamp', instructor: 'Pohong', tagKey: 'schedule.tag_intensity', color: 'orange', capacity: '15', levelKey: 'schedule.level_advanced' },
+    { time: '08:00 - 09:00', titleKey: 'schedule.core_base', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_core', color: 'purple', capacity: '20', levelKey: 'schedule.level_all' },
+    { time: '12:15 - 13:15', titleKey: 'schedule.noon_strength', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_strength', color: 'orange', capacity: '15', levelKey: 'schedule.level_intermediate' },
+    { time: '18:00 - 19:00', titleKey: 'schedule.yin_yoga', instructor: 'Yushan', tagKey: 'schedule.tag_relaxation', color: 'cyan', capacity: '20', levelKey: 'schedule.level_all' },
+    { time: '19:30 - 20:30', titleKey: 'schedule.zumba', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_dance', color: 'purple', capacity: '25', levelKey: 'schedule.level_beginner' }
   ],
-  evening: [
-    { time: '18:30 - 19:30', title: '綜合格鬥', instructor: 'Pohong', tag: 'Combat', color: 'red', description: '結合拳擊、泰拳與摔跤技巧，提升身體協調性、爆發力與基礎防身能力。', capacity: '10人', level: '進階' },
-    { time: '19:00 - 20:00', title: '舒心瑜珈', instructor: 'Heyitsxyc', tag: 'Relaxation', color: 'cyan', description: '透過深層呼吸與體位法練習，放鬆緊繃肌肉，找回內心的平靜與專注力。', capacity: '20人', level: '各等級皆可' },
-    { time: '19:30 - 20:30', title: 'TRX 全身訓練', instructor: 'Yushan', tag: 'Strength', color: 'orange', description: '利用懸吊系統進行全身性阻力訓練，同時挑戰肌力與核心穩定性。', capacity: '12人', level: '中階' },
-    { time: '20:00 - 21:00', title: 'Zumba 派對', instructor: 'Heyitsxyc', tag: 'Dance', color: 'purple', description: '充滿熱情的拉丁舞蹈節奏，讓你在快樂的氣氛中達到全身性的燃脂運動。', capacity: '25人', level: '入門' },
-    { time: '20:30 - 21:30', title: '深層伸展放鬆', instructor: 'Pohong', tag: 'Relaxation', color: 'cyan', description: '針對全天壓力進行釋放，透過長時間的停留與呼吸，緩解肌肉與神經的疲勞。', capacity: '22人', level: '各等級皆可' }
+  Wed: [
+    { time: '07:30 - 08:30', titleKey: 'schedule.reformer', instructor: 'Yushan', tagKey: 'schedule.tag_core', color: 'purple', capacity: '6', levelKey: 'schedule.level_intermediate' },
+    { time: '12:00 - 13:00', titleKey: 'schedule.hiit_burn', instructor: 'Pohong', tagKey: 'schedule.tag_cardio', color: 'red', capacity: '20', levelKey: 'schedule.level_advanced' },
+    { time: '18:30 - 19:30', titleKey: 'schedule.boxing_base', instructor: 'Leo', tagKey: 'schedule.tag_combat', color: 'orange', capacity: '15', levelKey: 'schedule.level_beginner' },
+    { time: '19:30 - 20:30', titleKey: 'schedule.functional_challenge', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_fitness', color: 'pink', capacity: '12', levelKey: 'schedule.level_intermediate' },
+    { time: '20:30 - 21:30', titleKey: 'schedule.sound_healing', instructor: 'Yushan', tagKey: 'schedule.tag_wellness', color: 'cyan', capacity: '15', levelKey: 'schedule.level_all' }
+  ],
+  Thu: [
+    { time: '07:00 - 08:00', titleKey: 'schedule.barbell_strength', instructor: 'Leo', tagKey: 'schedule.tag_strength', color: 'red', capacity: '12', levelKey: 'schedule.level_intermediate' },
+    { time: '12:15 - 13:15', titleKey: 'schedule.tabata_flash', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_intensity', color: 'orange', capacity: '18', levelKey: 'schedule.level_all' },
+    { time: '18:30 - 19:30', titleKey: 'schedule.muay_thai', instructor: 'Pohong', tagKey: 'schedule.tag_combat', color: 'red', capacity: '10', levelKey: 'schedule.level_beginner' },
+    { time: '19:30 - 20:30', titleKey: 'schedule.air_yoga', instructor: 'Yushan', tagKey: 'schedule.tag_flexibility', color: 'cyan', capacity: '8', levelKey: 'schedule.level_all' },
+    { time: '20:30 - 21:30', titleKey: 'schedule.leg_sculpt', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_recovery', color: 'pink', capacity: '20', levelKey: 'schedule.level_beginner' }
+  ],
+  Fri: [
+    { time: '07:30 - 08:30', titleKey: 'schedule.dawn_flow', instructor: 'Yushan', tagKey: 'schedule.tag_flow', color: 'cyan', capacity: '18', levelKey: 'schedule.level_all' },
+    { time: '12:00 - 13:00', titleKey: 'schedule.kettlebell', instructor: 'Leo', tagKey: 'schedule.tag_strength', color: 'orange', capacity: '12', levelKey: 'schedule.level_intermediate' },
+    { time: '18:30 - 19:30', titleKey: 'schedule.krav_maga', instructor: 'Pohong', tagKey: 'schedule.tag_defense', color: 'red', capacity: '12', levelKey: 'schedule.level_all' },
+    { time: '19:30 - 20:30', titleKey: 'schedule.glow_cycle', instructor: 'Leo', tagKey: 'schedule.tag_cardio', color: 'purple', capacity: '15', levelKey: 'schedule.level_all' },
+    { time: '20:30 - 21:30', titleKey: 'schedule.aroma_yoga', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_relaxation', color: 'cyan', capacity: '20', levelKey: 'schedule.level_all' }
+  ],
+  Sat: [
+    { time: '09:00 - 10:00', titleKey: 'schedule.warrior_camp', instructor: 'Pohong', tagKey: 'schedule.tag_challenge', color: 'red', capacity: '30', levelKey: 'schedule.level_advanced' },
+    { time: '10:30 - 11:30', titleKey: 'schedule.balance_core', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_core', color: 'purple', capacity: '15', levelKey: 'schedule.level_all' },
+    { time: '14:00 - 15:00', titleKey: 'schedule.air_stretch', instructor: 'Yushan', tagKey: 'schedule.tag_air_yoga', color: 'cyan', capacity: '8', levelKey: 'schedule.level_beginner' },
+    { time: '16:00 - 17:00', titleKey: 'schedule.bjj', instructor: 'Leo', tagKey: 'schedule.tag_combat', color: 'red', capacity: '12', levelKey: 'schedule.level_beginner' },
+    { time: '18:00 - 19:30', titleKey: 'schedule.twilight_meditation', instructor: 'Yushan', tagKey: 'schedule.tag_peace', color: 'cyan', capacity: '25', levelKey: 'schedule.level_all' }
+  ],
+  Sun: [
+    { time: '10:00 - 11:00', titleKey: 'schedule.morning_dance', instructor: 'Yushan', tagKey: 'schedule.tag_dance', color: 'pink', capacity: '30', levelKey: 'schedule.level_beginner' },
+    { time: '11:15 - 12:15', titleKey: 'schedule.body_recovery', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_recovery', color: 'cyan', capacity: '20', levelKey: 'schedule.level_all' },
+    { time: '14:30 - 15:30', titleKey: 'schedule.kpop_dance', instructor: 'Yushan', tagKey: 'schedule.tag_fun', color: 'purple', capacity: '30', levelKey: 'schedule.level_all' },
+    { time: '16:00 - 17:00', titleKey: 'schedule.rucking', instructor: 'Leo', tagKey: 'schedule.tag_outdoor', color: 'orange', capacity: '15', levelKey: 'schedule.level_intermediate' },
+    { time: '18:00 - 19:00', titleKey: 'schedule.muscle_balance', instructor: 'Heyitsxyc', tagKey: 'schedule.tag_consult', color: 'cyan', capacity: '10', levelKey: 'schedule.level_all' }
   ]
 };
 
-// Helper to shuffle based on a seed (day + date)
 const getDailySchedule = (day: string) => {
-  const today = new Date().toDateString();
-  const seed = today + day;
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-    hash |= 0;
-  }
-  
-  const rng = () => {
-    hash = Math.sin(hash) * 10000;
-    return hash - Math.floor(hash);
-  };
-
-  const pool = [
-    ...ALL_CLASSES.morning,
-    ...ALL_CLASSES.noon,
-    ...ALL_CLASSES.evening
-  ];
-
-  // Pick 5-6 random classes from the pool
-  const result = [...pool]
-    .sort(() => rng() - 0.5)
-    .slice(0, 5 + Math.floor(rng() * 2));
-
-  // Sort by time
-  return result.sort((a, b) => {
-    const timeA = parseInt(a.time.replace(':', ''));
-    const timeB = parseInt(b.time.replace(':', ''));
-    return timeA - timeB;
-  });
+  return SCHEDULE_DATA[day] || [];
 };
 
 export default function ClassSchedule() {
@@ -115,7 +118,7 @@ export default function ClassSchedule() {
     <div className="space-y-12" id="schedule">
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-8">
         <div className="space-y-4">
-          <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">Group Classes</p>
+          <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">{t('schedule.group_classes')}</p>
           <h3 className="text-5xl font-black italic uppercase">{t('schedule.title')}</h3>
         </div>
         
@@ -245,15 +248,15 @@ export default function ClassSchedule() {
                   <div className="p-8 md:p-12 space-y-8">
                     <div className="space-y-4">
                       <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white bg-gradient-to-r ${getColorClass(selectedClass.color)}`}>
-                        {selectedClass.tag}
+                        {t(selectedClass.tagKey)}
                       </span>
-                      <h3 className="text-4xl font-black italic uppercase">{selectedClass.title}</h3>
+                      <h3 className="text-4xl font-black italic uppercase">{t(selectedClass.titleKey)}</h3>
                     </div>
 
                     <div className="space-y-6">
                       <div className="space-y-2">
                         <h5 className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{t('schedule.intro')}</h5>
-                        <p className="text-slate-300 leading-relaxed font-medium">{selectedClass.description}</p>
+                        <p className="text-slate-300 leading-relaxed font-medium">{t(`${selectedClass.titleKey}.desc`)}</p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-6 py-6 border-y border-white/5">
@@ -263,7 +266,7 @@ export default function ClassSchedule() {
                         </div>
                         <div className="space-y-1">
                           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('schedule.level')}</p>
-                          <p className="text-lg font-bold text-cyan-400">{selectedClass.level}</p>
+                          <p className="text-lg font-bold text-cyan-400">{t(selectedClass.levelKey)}</p>
                         </div>
                       </div>
 
@@ -293,10 +296,10 @@ export default function ClassSchedule() {
       </AnimatePresence>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <ClassCategoryCard icon={<Zap size={20} />} title="高強度間歇" count="12 Classes" color="orange" />
-        <ClassCategoryCard icon={<Music size={20} />} title="炫彩舞蹈" count="8 Classes" color="purple" />
-        <ClassCategoryCard icon={<Users size={20} />} title="身心靈平衡" count="15 Classes" color="cyan" />
-        <ClassCategoryCard icon={<Calendar size={20} />} title="週預約熱門" count="Top Pick" color="pink" />
+        <ClassCategoryCard icon={<Zap size={20} />} title={t('schedule.cat_hiit')} count={`12 ${t('schedule.classes_count')}`} color="orange" />
+        <ClassCategoryCard icon={<Music size={20} />} title={t('schedule.cat_dance')} count={`8 ${t('schedule.classes_count')}`} color="purple" />
+        <ClassCategoryCard icon={<Users size={20} />} title={t('schedule.cat_wellness')} count={`15 ${t('schedule.classes_count')}`} color="cyan" />
+        <ClassCategoryCard icon={<Calendar size={20} />} title={t('schedule.cat_pick')} color="pink" />
       </div>
     </div>
   );
@@ -313,7 +316,7 @@ function getColorClass(color: string) {
   return colorMap[color as keyof typeof colorMap];
 }
 
-function ClassItem({ time, title, instructor, tag, color, t, onClick }: any) {
+function ClassItem({ time, titleKey, instructor, tagKey, color, t, onClick }: any) {
   const borderMap = {
     orange: 'border-orange-500/20',
     cyan: 'border-cyan-400/20',
@@ -330,14 +333,14 @@ function ClassItem({ time, title, instructor, tag, color, t, onClick }: any) {
         </div>
         <div className="h-10 w-[2px] bg-white/5 hidden sm:block" />
         <div>
-          <h5 className="text-lg font-bold group-hover:text-cyan-400 transition-colors uppercase">{title}</h5>
+          <h5 className="text-lg font-bold group-hover:text-cyan-400 transition-colors uppercase">{t(titleKey)}</h5>
           <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{t('schedule.instructor')}: {instructor}</p>
         </div>
       </div>
       
       <div className="flex items-center justify-between w-full sm:w-auto gap-6">
         <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white bg-gradient-to-r ${getColorClass(color)}`}>
-          {tag}
+          {t(tagKey)}
         </span>
         <button 
           onClick={onClick}

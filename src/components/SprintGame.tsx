@@ -266,7 +266,7 @@ export default function SprintGame({ onClose, onSuccess }: SprintGameProps) {
               <div className={`w-24 h-24 ${selectedTheme.accent}/20 rounded-3xl mx-auto flex items-center justify-center ${selectedTheme.primary}`}>
                 <Trophy size={48} />
               </div>
-              <h2 className="text-4xl font-black italic tracking-tighter uppercase">Athlete Stadium</h2>
+              <h2 className="text-4xl font-black italic tracking-tighter uppercase">{t('games.sprint.stadium')}</h2>
               <div className="text-slate-400 font-mono text-sm max-w-md mx-auto">
                 {t('games.sprint.instructions')}
               </div>
@@ -284,7 +284,7 @@ export default function SprintGame({ onClose, onSuccess }: SprintGameProps) {
 
         {gameState === 'themeSelect' && (
           <div className="text-center space-y-10 py-10 w-full">
-            <h2 className="text-3xl font-black italic uppercase">Select Your Environment</h2>
+            <h2 className="text-3xl font-black italic uppercase">{t('games.sprint.select_env')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
               {TRACK_THEMES.map(theme => (
                 <button
@@ -311,7 +311,7 @@ export default function SprintGame({ onClose, onSuccess }: SprintGameProps) {
 
         {gameState === 'modeSelect' && (
           <div className="text-center space-y-10 py-10 w-full">
-            <h2 className="text-3xl font-black italic uppercase">Select Track Distance</h2>
+            <h2 className="text-3xl font-black italic uppercase">{t('games.sprint.select_dist')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
               {[100, 200].map(dist => (
                 <button
@@ -342,7 +342,7 @@ export default function SprintGame({ onClose, onSuccess }: SprintGameProps) {
               exit={{ scale: 3, opacity: 0 }}
               className={`text-8xl font-black italic ${selectedTheme.primary}`}
             >
-              {countdown === 0 ? 'GO!' : countdown}
+              {countdown === 0 ? t('games.sprint.go') : countdown}
             </motion.div>
           </div>
         )}
@@ -383,7 +383,7 @@ export default function SprintGame({ onClose, onSuccess }: SprintGameProps) {
                     <UserIcon size={24} />
                   </motion.div>
                   <div className="flex flex-col whitespace-nowrap">
-                    <span className={`text-[10px] font-black uppercase ${selectedTheme.primary}`}>YOU</span>
+                    <span className={`text-[10px] font-black uppercase ${selectedTheme.primary}`}>{t('games.sprint.you')}</span>
                   </div>
                 </motion.div>
               </div>
@@ -411,19 +411,19 @@ export default function SprintGame({ onClose, onSuccess }: SprintGameProps) {
                 >
                   <Trophy size={64} fill="currentColor" />
                 </motion.div>
-                <h2 className="text-5xl font-black italic tracking-tighter uppercase">FINISH!</h2>
+                <h2 className="text-5xl font-black italic tracking-tighter uppercase">{currentDist >= targetDist && opponents.every(o => currentDist > o.progress) ? t('games.sprint.champion') : t('games.sprint.finish')}</h2>
                 <div className={`${selectedTheme.primary} font-bold uppercase tracking-widest bg-white/5 py-1 rounded-full`}>
-                  {currentDist >= targetDist && opponents.every(o => currentDist > o.progress) ? "CHAMPION!" : "KEEP RUNNING!"}
+                  {currentDist >= targetDist && opponents.every(o => currentDist > o.progress) ? t('games.sprint.champion') : t('games.sprint.keep_running')}
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="glass p-6 rounded-3xl space-y-1">
-                  <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest leading-none">Time ({targetDist}m)</p>
+                  <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest leading-none">{t('games.sprint.time')} ({targetDist}m)</p>
                   <p className="text-3xl font-black italic text-white">{time.toFixed(2)}s</p>
                 </div>
                 <div className="glass p-6 rounded-3xl space-y-1">
-                  <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest leading-none">Power Score</p>
+                  <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest leading-none">{t('games.sprint.score')}</p>
                   <p className={`text-3xl font-black italic ${selectedTheme.primary}`}>{Math.max(0, Math.floor(targetDist * 30 - time * 150))}</p>
                 </div>
               </div>

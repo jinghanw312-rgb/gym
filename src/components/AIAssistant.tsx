@@ -8,7 +8,7 @@ import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 export default function AIAssistant() {
-  const { t } = useLanguage();
+  const { t, currentLang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -58,7 +58,7 @@ export default function AIAssistant() {
       }));
 
       // 3. Get AI response
-      const response = await askFitnessQuestion(userText, history);
+      const response = await askFitnessQuestion(userText, history, currentLang.name);
       
       // 4. Save AI response to Firestore
       await sendMessage(user.uid, 'assistant', response || t('ai.error_response'));
@@ -119,7 +119,7 @@ export default function AIAssistant() {
                   </div>
                   <div>
                     <h3 className="font-black italic uppercase tracking-tighter text-white">{t('ai.title')}</h3>
-                    <p className="text-[10px] text-cyan-400 font-mono uppercase tracking-widest">Always Online</p>
+                    <p className="text-[10px] text-cyan-400 font-mono uppercase tracking-widest">{t('ai.status')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

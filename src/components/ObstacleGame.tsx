@@ -218,7 +218,7 @@ export default function ObstacleGame({ onClose, onSuccess }: ObstacleGameProps) 
               <div className="w-24 h-24 bg-green-500/20 rounded-3xl mx-auto flex items-center justify-center text-green-400">
                 <Crosshair size={48} />
               </div>
-              <h2 className="text-4xl font-black italic tracking-tighter uppercase">Easy Hurdles</h2>
+              <h2 className="text-4xl font-black italic tracking-tighter uppercase">{t('games.hurdles.name')}</h2>
               <div className="text-slate-400 font-mono text-sm max-w-md mx-auto space-y-2">
                 <p>{t('games.hurdles.instructions')}</p>
                 <div className="flex justify-center gap-6 pt-2">
@@ -246,7 +246,7 @@ export default function ObstacleGame({ onClose, onSuccess }: ObstacleGameProps) 
 
         {gameState === 'modeSelect' && (
           <div className="text-center space-y-10 py-10 w-full">
-            <h2 className="text-3xl font-black italic uppercase">Select Level</h2>
+            <h2 className="text-3xl font-black italic uppercase">{t('games.hurdles.select_level')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
               {[
                 { id: 'easy', name: t('games.hurdles.level_easy'), desc: t('games.hurdles.desc_easy'), color: 'from-green-500' },
@@ -281,7 +281,7 @@ export default function ObstacleGame({ onClose, onSuccess }: ObstacleGameProps) 
               </div>
               <div className="flex items-center gap-4">
                  <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest leading-none">Level</span>
+                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest leading-none">{t('schedule.level')}</span>
                     <span className="text-sm font-black italic uppercase text-green-400">{difficulty}</span>
                  </div>
               </div>
@@ -332,7 +332,7 @@ export default function ObstacleGame({ onClose, onSuccess }: ObstacleGameProps) 
             </div>
 
             {/* Controls Info */}
-            <p className="text-center text-[10px] text-slate-500 font-mono uppercase tracking-[0.2em]">使用鍵盤箭頭或 WASD 進行移動</p>
+            <p className="text-center text-[10px] text-slate-500 font-mono uppercase tracking-[0.2em]">{t('games.hurdles.controls')}</p>
           </div>
         )}
 
@@ -345,7 +345,7 @@ export default function ObstacleGame({ onClose, onSuccess }: ObstacleGameProps) 
             >
               <div className="text-center space-y-6">
                 <AlertTriangle size={64} className="text-orange-500 mx-auto" />
-                <h3 className="text-3xl font-black italic">CRASHED!</h3>
+                <h3 className="text-3xl font-black italic uppercase">{t('games.sprint.crashed')}</h3>
                 <button 
                   onClick={() => startCountdown(difficulty)}
                   className="px-8 py-3 bg-white text-slate-950 rounded-full font-black uppercase text-sm hover:bg-green-400 transition-all flex items-center gap-2 mx-auto"
@@ -369,7 +369,7 @@ export default function ObstacleGame({ onClose, onSuccess }: ObstacleGameProps) 
                 <h3 className="text-4xl font-black italic uppercase">{t('games.hurdles.goal')}</h3>
                 
                 <div className="glass p-6 rounded-3xl space-y-1">
-                  <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-2">Technical performance</p>
+                  <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-2">{t('games.sprint.score')}</p>
                   <div className="flex justify-between items-center text-xl font-black italic">
                     <span>{time.toFixed(2)}s</span>
                     <span className="text-green-400">+{Math.max(0, Math.floor(2500 - time * 120))} {t('games.hurdles.points')}</span>
@@ -394,7 +394,7 @@ export default function ObstacleGame({ onClose, onSuccess }: ObstacleGameProps) 
               exit={{ scale: 3, opacity: 0 }}
               className="text-8xl font-black italic text-green-400"
             >
-              {countdown === 0 ? 'GO!' : countdown}
+              {countdown === 0 ? t('games.sprint.go') : countdown}
             </motion.div>
           </div>
         )}

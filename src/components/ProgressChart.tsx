@@ -10,12 +10,14 @@ import {
 } from 'recharts';
 import { SportsLog } from '../services/sportsService';
 import { format, subDays, startOfDay, isSameDay } from 'date-fns';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ProgressChartProps {
   logs: SportsLog[];
 }
 
 export default function ProgressChart({ logs }: ProgressChartProps) {
+  const { t } = useLanguage();
   // Generate last 7 days data
   const data = Array.from({ length: 7 }).map((_, i) => {
     const date = subDays(new Date(), 6 - i);
@@ -38,14 +40,14 @@ export default function ProgressChart({ logs }: ProgressChartProps) {
     <div className="glass rounded-[2.5rem] p-8 border border-white/5 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-bold tracking-tight text-white">熱量消耗趨勢</h3>
-          <p className="text-[10px] uppercase font-bold text-slate-500 tracking-widest mt-1">Calorie Consumption Trend</p>
+          <h3 className="text-xl font-bold tracking-tight text-white">{t('dashboard.chart.title')}</h3>
+          <p className="text-[10px] uppercase font-bold text-slate-500 tracking-widest mt-1">{t('dashboard.chart.subtitle')}</p>
         </div>
         <div className="text-right">
           <p className="text-2xl font-black italic text-pink-500">
             {data.reduce((sum, d) => sum + d.calories, 0)}
           </p>
-          <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">7-Day Total Kcal</p>
+          <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">{t('dashboard.chart.total')}</p>
         </div>
       </div>
 

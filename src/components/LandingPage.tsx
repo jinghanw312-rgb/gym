@@ -20,6 +20,9 @@ import {
 import GymLocations from './GymLocations';
 import ClassSchedule from './ClassSchedule';
 import PrivateCoaching from './PrivateCoaching';
+import FitnessTools from './FitnessTools';
+import MembershipSection from './MembershipSection';
+import DashboardPreview from './DashboardPreview';
 import { submitToSheet } from '../services/sheetService';
 import { useLanguage, LANGUAGES, LanguageCode } from '../context/LanguageContext';
 
@@ -31,79 +34,86 @@ interface LandingPageProps {
 interface CourseDetail {
   image: string;
   category: string;
+  categoryKey?: string;
   title: string;
+  titleKey?: string;
   price: string;
+  priceKey?: string;
   target: string;
+  targetKey?: string;
   goals: string[];
+  goalKeys?: string[];
   content: string;
+  contentKey?: string;
   duration: string;
+  durationKey?: string;
 }
 
 const TRANSFORMATIONS = [
   {
-    name: '林先生',
-    story: '在 NEO-GYM 訓練 6 個月，成功減重 15 公斤並增加 5 公斤肌肉。',
-    result: '-15kg Weight Loss',
-    image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
-    details: '林先生原本因為工作忙碌忽略健康，身體檢查出現多項紅字。在教練引導下，從每週兩次重訓開始，配合精密飲食控制，不僅體態改變，體力也有顯著提升。',
-    stats: { before: '95kg', after: '80kg', duration: '6 Months' }
+    nameKey: 'story.lin.name',
+    storyKey: 'story.lin.story',
+    resultKey: 'story.result.weightloss',
+    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=800',
+    detailsKey: 'story.lin.details',
+    stats: { before: '95kg', after: '80kg', duration: '6', durationUnitKey: 'story.stat.months' }
   },
   {
-    name: '張小姐',
-    story: '從完全不運動到現在能完成馬拉松訓練，教練的指導非常關鍵。',
-    result: 'Improved Fitness',
-    image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
-    details: '張小姐曾對健身房有恐懼感，但在 NEO-GYM 溫馨專業的氛圍下找到了動力。教練針對其核心力量與心肺耐力制定了專屬計畫，目前已成功挑戰生涯首場半馬。',
-    stats: { before: 'Beginner', after: 'Runner', duration: '1 Year' }
+    nameKey: 'story.chang.name',
+    storyKey: 'story.chang.story',
+    resultKey: 'story.result.fitness',
+    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=800',
+    detailsKey: 'story.chang.details',
+    stats: { before: '55kg', after: '52kg', duration: '12', durationUnitKey: 'story.stat.months' }
   },
   {
-    name: '王先生',
-    story: '長期久坐導致嚴重的下背痛，透過核心強化訓練後痛苦完全消失了。',
-    result: 'Pain-Free Life',
-    image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
-    details: '身為工程師的王先生長期受腰痠背痛所苦。加入 NEO-GYM 後，教練透過紅繩系統與功能性訓練，循序漸進強化他的核心肌群。現在他不只能正常工作，還能參與球類運動。',
-    stats: { before: 'Sedentary', after: 'Active', duration: '8 Months' }
+    nameKey: 'story.wang.name',
+    storyKey: 'story.wang.story',
+    resultKey: 'story.result.painfree',
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800',
+    detailsKey: 'story.wang.details',
+    stats: { before: '78kg', after: '72kg', duration: '8', durationUnitKey: 'story.stat.months' }
   },
   {
-    name: '李小姐',
-    story: '產後肥胖曾讓我陷入低潮，在這裡我不僅找回了體態，更找回了自信。',
-    result: 'Body Recomposition',
-    image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
-    details: '產後三年的李小姐一直無法回到理想體重。在營養室與私人教練的雙管齊下，她學會了正確的飲食觀念與能量代謝原理。目前的體脂率甚至比產前還要低！',
-    stats: { before: '28% Body Fat', after: '20% Body Fat', duration: '10 Months' }
+    nameKey: 'story.lee.name',
+    storyKey: 'story.lee.story',
+    resultKey: 'story.result.recomp',
+    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=800',
+    detailsKey: 'story.lee.details',
+    stats: { before: '28%', after: '20%', duration: '10', durationUnitKey: 'story.stat.months' }
   }
 ];
 
-const COURSE_DETAILS: Record<string, CourseDetail> = {
-  "極致健體雕塑": {
+const COURSE_DETAILS: Record<string, any> = {
+  "course1": {
     image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=800",
-    category: "肌力訓練",
-    title: "極致健體雕塑",
-    price: "NT$ 1,200 / 堂",
-    target: "追求極致肌肉線條、想要增肌減脂或備賽需要的學員。",
-    goals: ["增加肌肉肥大", "精準局部雕塑", "提升基礎代謝"],
-    content: "採用科學載荷遞增法，針對特定肌群進行深層刺激。課程包含精密的力量評估與動作矯正，確保每一份汗水都轉化為視覺上的震撼改變。",
-    duration: "60 min"
+    categoryKey: "course.sculpt.category",
+    titleKey: "course.sculpt.title",
+    priceKey: "course.sculpt.price",
+    targetKey: "course.sculpt.target",
+    goalKeys: ["course.sculpt.goal1", "course.sculpt.goal2", "course.sculpt.goal3"],
+    contentKey: "course.sculpt.content",
+    durationKey: "course.sculpt.duration"
   },
-  "高效燃脂循環": {
+  "course2": {
     image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&q=80&w=800",
-    category: "心肺耐力",
-    title: "高效燃脂循環",
-    price: "NT$ 1,000 / 堂",
-    target: "希望在短時間內消耗大量熱量、提升心肺功能者。",
-    goals: ["極致燃脂", "提升心肺耐力", "改善運動表現"],
-    content: "結合高強度間歇訓練 (HIIT) 與功能性動作。透過不間斷的動作組合，讓身體在課後持續產生「後燃效應」，是追求減重效果的首選課程。",
-    duration: "50 min"
+    categoryKey: "course.burn.category",
+    titleKey: "course.burn.title",
+    priceKey: "course.burn.price",
+    targetKey: "course.burn.target",
+    goalKeys: ["course.burn.goal1", "course.burn.goal2", "course.burn.goal3"],
+    contentKey: "course.burn.content",
+    durationKey: "course.burn.duration"
   },
-  "核心穩定強化": {
+  "course3": {
     image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=800",
-    category: "功能訓練",
-    title: "核心穩定強化",
-    price: "NT$ 1,100 / 堂",
-    target: "長期久坐、姿勢不良或希望提升運動穩定性的學員。",
-    goals: ["預防運動傷害", "改善體態姿勢", "強化深層核心"],
-    content: "專注於脊椎穩定與多平面動作控制。透過皮拉提斯、核心滑盤與懸吊設備，找回身體失落的連結，打造強韌且穩定的身體基石。",
-    duration: "50 min"
+    categoryKey: "course.core.category",
+    titleKey: "course.core.title",
+    priceKey: "course.core.price",
+    targetKey: "course.core.target",
+    goalKeys: ["course.core.goal1", "course.core.goal2", "course.core.goal3"],
+    contentKey: "course.core.content",
+    durationKey: "course.core.duration"
   }
 };
 
@@ -180,6 +190,7 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
           <a href="#courses" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">{t('nav.courses')}</a>
           <a href="#coaching" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">{t('nav.coaching')}</a>
           <a href="#schedule" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">{t('nav.schedule')}</a>
+          <a href="#membership" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">{t('nav.membership')}</a>
           <a href="#locations" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">{t('nav.locations')}</a>
           <a href="#contact" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">{t('nav.contact')}</a>
           
@@ -259,7 +270,7 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
             transition={{ duration: 0.8 }}
             className="space-y-4"
           >
-            <p className="text-cyan-400 font-mono text-sm tracking-[0.5em] uppercase font-black">Professional Training Studio</p>
+            <p className="text-cyan-400 font-mono text-sm tracking-[0.5em] uppercase font-black">{t('landing.hero.subtitle')}</p>
             <h2 className="text-5xl md:text-8xl font-black italic uppercase leading-none tracking-tighter">
               {t('hero.title')}
             </h2>
@@ -328,7 +339,7 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
         <div className="max-w-7xl mx-auto px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
             <div className="space-y-4">
-              <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">Featured Courses</p>
+              <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">{t('landing.courses.featured')}</p>
               <h3 className="text-5xl font-black italic uppercase">{t('courses.title')}</h3>
             </div>
             <p className="text-slate-400 max-w-md font-medium leading-relaxed">
@@ -337,13 +348,13 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Object.values(COURSE_DETAILS).map((course) => (
+            {Object.values(COURSE_DETAILS).map((course, idx) => (
               <CourseCard 
-                key={course.title}
+                key={idx}
                 image={course.image}
-                category={course.category}
-                title={course.title}
-                price={course.price}
+                category={t(course.categoryKey)}
+                title={t(course.titleKey)}
+                price={t(course.priceKey)}
                 onClick={() => setSelectedCourse(course)}
               />
             ))}
@@ -375,30 +386,30 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
                 </button>
 
                 <div className="lg:w-1/2 h-80 lg:h-auto relative">
-                  <img src={selectedCourse.image} className="w-full h-full object-cover" alt={selectedCourse.title} />
+                  <img src={selectedCourse.image} referrerPolicy="no-referrer" className="w-full h-full object-cover" alt={selectedCourse.title} />
                   <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#050505]/80 to-transparent" />
                 </div>
 
                 <div className="lg:w-1/2 p-10 md:p-16 space-y-8 overflow-y-auto">
                   <div className="space-y-4">
-                    <span className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">{selectedCourse.category}</span>
-                    <h4 className="text-4xl md:text-5xl font-black italic uppercase">{selectedCourse.title}</h4>
-                    <p className="text-2xl font-mono text-cyan-400">{selectedCourse.price}</p>
+                    <span className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">{t(selectedCourse.categoryKey)}</span>
+                    <h4 className="text-4xl md:text-5xl font-black italic uppercase">{t(selectedCourse.titleKey)}</h4>
+                    <p className="text-2xl font-mono text-cyan-400">{t(selectedCourse.priceKey)}</p>
                   </div>
 
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('courses.target_group')}</p>
-                      <p className="text-slate-300 font-medium">{selectedCourse.target}</p>
+                      <p className="text-slate-300 font-medium">{t(selectedCourse.targetKey)}</p>
                     </div>
 
                     <div className="space-y-2">
                       <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('courses.goals_title')}</p>
                       <div className="flex flex-wrap gap-3">
-                        {selectedCourse.goals.map(goal => (
-                          <div key={goal} className="px-4 py-2 glass bg-white/5 rounded-xl border border-white/10 text-xs font-bold text-white flex items-center gap-2">
+                        {selectedCourse.goalKeys.map((goalKey: string) => (
+                          <div key={goalKey} className="px-4 py-2 glass bg-white/5 rounded-xl border border-white/10 text-xs font-bold text-white flex items-center gap-2">
                             <CheckCircle2 size={14} className="text-cyan-400" />
-                            {goal}
+                            {t(goalKey)}
                           </div>
                         ))}
                       </div>
@@ -406,13 +417,13 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
 
                     <div className="space-y-2">
                       <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('courses.details_title')}</p>
-                      <p className="text-slate-400 leading-relaxed">{selectedCourse.content}</p>
+                      <p className="text-slate-400 leading-relaxed">{t(selectedCourse.contentKey)}</p>
                     </div>
 
                     <div className="pt-6 border-t border-white/10 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Clock className="text-cyan-400" size={16} />
-                        <span className="text-sm font-bold">{t('courses.duration_label')} {selectedCourse.duration}</span>
+                        <span className="text-sm font-bold">{t('courses.duration_label')} {t(selectedCourse.durationKey)}</span>
                       </div>
                       <button 
                         onClick={() => {
@@ -447,11 +458,19 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
         <PrivateCoaching />
       </section>
 
+      <section id="tools">
+        <FitnessTools />
+      </section>
+
+      <MembershipSection />
+
+      <DashboardPreview />
+
       {/* Transformations */}
       <section className="py-32 px-8 max-w-7xl mx-auto bg-white/5 rounded-[3rem] border border-white/5">
         <div className="text-center space-y-4 mb-20">
           <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">Success Stories</p>
-          <h3 className="text-5xl font-black italic uppercase">{t('success.title')}</h3>
+          <h3 className="text-5xl font-black italic uppercase">{t('landing.stories.title')}</h3>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -463,14 +482,14 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
               className="glass p-8 rounded-[3rem] border border-white/5 flex flex-col md:flex-row gap-8 items-center cursor-pointer group"
             >
               <div className="w-48 h-48 rounded-[2rem] overflow-hidden shrink-0 shadow-2xl relative">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                <img src={item.image} alt={t(item.nameKey)} referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
                 <div className="absolute inset-0 bg-cyan-500/20 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               <div className="space-y-4 text-center md:text-left">
-                <p className="text-2xl font-black italic text-cyan-400">{item.result}</p>
+                <p className="text-2xl font-black italic text-cyan-400">{t(item.resultKey)}</p>
                 <div className="space-y-2">
-                  <h5 className="text-xl font-bold">{item.name}</h5>
-                  <p className="text-slate-400 font-medium leading-relaxed italic">"{item.story}"</p>
+                  <h5 className="text-xl font-bold">{t(item.nameKey)}</h5>
+                  <p className="text-slate-400 font-medium leading-relaxed italic">"{t(item.storyKey)}"</p>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] font-black uppercase tracking-widest text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity">
                   {t('schedule.detail')} <ChevronRight size={12} />
@@ -506,42 +525,42 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
                 </button>
 
                 <div className="md:w-1/2 h-80 md:h-auto relative">
-                  <img src={selectedTransformation.image} className="w-full h-full object-cover" alt={selectedTransformation.name} />
+                  <img src={selectedTransformation.image} referrerPolicy="no-referrer" className="w-full h-full object-cover" alt={t(selectedTransformation.nameKey)} />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent md:bg-gradient-to-r" />
                   <div className="absolute bottom-10 left-10">
-                    <p className="text-cyan-400 font-black italic text-4xl mb-2">{selectedTransformation.result}</p>
-                    <p className="text-white font-bold opacity-60">Success Story / {selectedTransformation.name}</p>
+                    <p className="text-cyan-400 font-black italic text-4xl mb-2">{t(selectedTransformation.resultKey)}</p>
+                    <p className="text-white font-bold opacity-60">{t('landing.stories.title')} / {t(selectedTransformation.nameKey)}</p>
                   </div>
                 </div>
 
                 <div className="md:w-1/2 p-12 space-y-8 overflow-y-auto max-h-[80vh]">
                   <div className="space-y-4">
                     <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">Transformation Details</p>
-                    <h3 className="text-4xl font-black italic uppercase">{t('success.details_title')}</h3>
+                    <h3 className="text-4xl font-black italic uppercase">{t('landing.stories.details_title')}</h3>
                   </div>
 
                   <div className="space-y-4 text-slate-300 leading-relaxed">
-                    <p className="text-lg font-medium italic">"{selectedTransformation.story}"</p>
-                    <p className="text-sm opacity-80">{selectedTransformation.details}</p>
+                    <p className="text-lg font-medium italic">"{t(selectedTransformation.storyKey)}"</p>
+                    <p className="text-sm opacity-80">{t(selectedTransformation.detailsKey)}</p>
                   </div>
 
                   <div className="grid grid-cols-3 gap-4 py-8 border-y border-white/5">
                     <div className="text-center space-y-1">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('success.before')}</p>
-                      <p className="text-xl font-black italic text-white">{selectedTransformation.stats.before}</p>
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('landing.stories.before')}</p>
+                      <p className="text-xl font-black italic text-white">{selectedTransformation.stats.beforeKey ? t(selectedTransformation.stats.beforeKey) : selectedTransformation.stats.before}</p>
                     </div>
                     <div className="text-center space-y-1">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('success.after')}</p>
-                      <p className="text-xl font-black italic text-cyan-400">{selectedTransformation.stats.after}</p>
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('landing.stories.after')}</p>
+                      <p className="text-xl font-black italic text-cyan-400">{selectedTransformation.stats.afterKey ? t(selectedTransformation.stats.afterKey) : selectedTransformation.stats.after}</p>
                     </div>
                     <div className="text-center space-y-1">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('success.duration')}</p>
-                      <p className="text-xl font-black italic text-white">{selectedTransformation.stats.duration}</p>
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('landing.stories.duration')}</p>
+                      <p className="text-xl font-black italic text-white">{selectedTransformation.stats.duration} {t(selectedTransformation.stats.durationUnitKey)}</p>
                     </div>
                   </div>
 
                   <button className="w-full py-5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl font-black uppercase text-sm tracking-widest hover:scale-105 transition-all shadow-xl shadow-cyan-500/20">
-                    {t('success.cta')}
+                    {t('landing.stories.cta')}
                   </button>
                 </div>
               </motion.div>
@@ -555,7 +574,7 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
           <div className="space-y-12">
             <div className="space-y-4">
-              <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">Contact Us</p>
+              <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">{t('landing.contact.featured')}</p>
               <h3 className="text-6xl font-black italic uppercase">{t('contact.title')}</h3>
               <p className="text-slate-400 text-lg leading-relaxed max-w-md">
                 {t('contact.subtitle')}
@@ -563,10 +582,10 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
             </div>
 
             <div className="space-y-8">
-              <ContactInfoItem icon={<MapPin className="text-cyan-400" />} label={t('contact.info.address')} value="台北市信義區競技路 101 號" />
-              <ContactInfoItem icon={<Phone className="text-cyan-400" />} label={t('contact.info.phone')} value="02-2345-6789" />
+              <ContactInfoItem icon={<MapPin className="text-cyan-400" />} label={t('contact.info.address')} value={t('contact.info.address_val')} />
+              <ContactInfoItem icon={<Phone className="text-cyan-400" />} label={t('contact.info.phone')} value="02-8988-5566" />
               <ContactInfoItem icon={<Mail className="text-cyan-400" />} label={t('contact.info.email')} value="contact@neo-gym.com" />
-              <ContactInfoItem icon={<Clock className="text-cyan-400" />} label={t('contact.info.hours')} value="09:00 - 22:00 (每日)" />
+              <ContactInfoItem icon={<Clock className="text-cyan-400" />} label={t('contact.info.hours')} value={t('contact.info.hours_val')} />
             </div>
 
             <div className="space-y-4">
@@ -772,7 +791,7 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
   );
 }
 
-function CourseCard({ image, category, title, price, onClick }: { image: string, category: string, title: string, price: string, onClick: () => void, key?: string }) {
+function CourseCard({ image, category, title, price, onClick }: { image: string, category: string, title: string, price: string, onClick: () => void }) {
   const { t } = useLanguage();
   return (
     <div 

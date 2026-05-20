@@ -214,8 +214,8 @@ export default function App() {
   const [view, setView] = useState<'landing' | 'dashboard'>('landing');
   
   // Form State
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [exercise, setExercise] = useState(EXERCISES[CATEGORIES[0] as keyof typeof EXERCISES][0]);
+  const [category, setCategory] = useState<string>(CATEGORIES[0]);
+  const [exercise, setExercise] = useState<string>(EXERCISES[CATEGORIES[0] as keyof typeof EXERCISES][0]);
   const [customExercise, setCustomExercise] = useState('');
   const [value, setValue] = useState('');
   const [kcal, setKcal] = useState('');

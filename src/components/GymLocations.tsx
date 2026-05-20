@@ -6,43 +6,43 @@ import { useLanguage } from '../context/LanguageContext';
 
 const LOCATIONS = [
   {
-    id: 'xinyi',
-    name: '信義旗艦店',
-    address: '台北市信義區競技路 101 號',
-    phone: '02-2345-6789',
+    id: 'xinzhuang',
+    nameKey: 'location.xinzhuang.name',
+    addressKey: 'location.xinzhuang.addr',
+    phone: '02-8988-5566',
     hours: '06:00 - 24:00',
-    tags: ['桑拿', '拳擊場', '攀岩牆'],
-    description: '位於信義區核心地帶，擁有全台最先進的 Matrix 競技器材。提供專業攀岩課程與高階拳擊訓練。',
+    tagKeys: ['location.tag.strength', 'location.tag.grass', 'location.tag.inbody'],
+    descriptionKey: 'location.xinzhuang.desc',
     image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=800'
   } as const,
   {
     id: 'daan',
-    name: '大安精品店',
-    address: '台北市大安區忠孝東路四段 88 號',
+    nameKey: 'location.daan.name',
+    addressKey: 'location.daan.addr',
     phone: '02-8765-4321',
     hours: '07:00 - 23:00',
-    tags: ['瑜珈室', '皮拉提斯', '咖啡吧'],
-    description: '頂級精品健身空間，專注於身心平衡與塑形。提供一對一皮拉提斯大器械教學，以及營養師調配的專屬能量飲品。',
+    tagKeys: ['location.tag.yoga', 'location.tag.pilates', 'location.tag.coffee'],
+    descriptionKey: 'location.daan.desc',
     image: 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&q=80&w=800'
   } as const,
   {
     id: 'neihu',
-    name: '內湖科技店',
-    address: '台北市內湖區瑞光路 500 號',
+    nameKey: 'location.neihu.name',
+    addressKey: 'location.neihu.addr',
     phone: '02-1122-3344',
-    hours: '24小時營業',
-    tags: ['24H', '重訓區', '飛輪教室'],
-    description: '專為科技精英打造的 24 小時運動空間。擁有多元化重訓區與沉浸式飛輪投影教室，隨時滿足您的運動渴望。',
+    hoursKey: 'location.hours.24',
+    tagKeys: ['location.tag.24h', 'location.tag.strength', 'location.tag.cycling'],
+    descriptionKey: 'location.neihu.desc',
     image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800'
   } as const,
   {
     id: 'taichung',
-    name: '台中新光店',
-    address: '台中市西屯區台灣大道三段 301 號',
+    nameKey: 'location.taichung.name',
+    addressKey: 'location.taichung.addr',
     phone: '04-3344-5566',
     hours: '06:00 - 24:00',
-    tags: ['超大重訓空間', '戶外訓練區'],
-    description: '中台灣最大規模據點，擁有寬敞的戶外訓練區與草坪區。適合進行 CrossFit 與強人訓練，提供最硬派的鍛鍊環境。',
+    tagKeys: ['location.tag.strength', 'location.tag.outdoor', 'location.tag.grass'],
+    descriptionKey: 'location.taichung.desc',
     image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&q=80&w=800'
   } as const
 ];
@@ -56,7 +56,7 @@ export default function GymLocations() {
   const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
   
   const filteredLocations = LOCATIONS.filter(loc => 
-    loc.name.includes(searchTerm) || loc.address.includes(searchTerm)
+    t(loc.nameKey).includes(searchTerm) || t(loc.addressKey).includes(searchTerm)
   );
 
   const resetModals = () => {
@@ -76,7 +76,7 @@ export default function GymLocations() {
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
-        location: selectedLoc?.name || 'Unspecified'
+        location: selectedLoc ? t(selectedLoc.nameKey) : 'Unspecified'
       });
     } catch (error) {
       console.error('Sheet submission failed:', error);
@@ -98,18 +98,18 @@ export default function GymLocations() {
       </div>
       <div className="space-y-2">
         <h3 className="text-3xl font-black italic uppercase">{t('locations.booking_success')}</h3>
-        <p className="text-slate-400 font-medium">{selectedLoc?.name} {t('locations.booking_received')}</p>
+        <p className="text-slate-400 font-medium">{selectedLoc ? t(selectedLoc.nameKey) : ''} {t('locations.booking_received')}</p>
       </div>
-      <p className="text-xs text-slate-500">Redirecting in 3 seconds...</p>
+      <p className="text-xs text-slate-500">{t('locations.redirect_note')}</p>
     </motion.div>
   );
 
   const ConsultationForm = () => (
     <div className="p-8 md:p-12 space-y-8">
       <div className="space-y-2 text-center">
-        <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">Free Visit Booking</p>
+        <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">{t('locations.visit_booking')}</p>
         <h3 className="text-3xl font-black italic uppercase">{t('locations.booking_title')}</h3>
-        <p className="text-slate-400 text-sm">{t('locations.title')}：{selectedLoc?.name}</p>
+        <p className="text-slate-400 text-sm">{t('locations.title')}：{selectedLoc ? t(selectedLoc.nameKey) : ''}</p>
       </div>
 
       <form onSubmit={handleBookingSubmit} className="space-y-4">
@@ -172,7 +172,7 @@ export default function GymLocations() {
     <div className="space-y-12" id="locations">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-4">
-          <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">Find a Club</p>
+          <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">{t('landing.locations.label')}</p>
           <h3 className="text-5xl font-black italic uppercase">{t('locations.title')}</h3>
         </div>
         
@@ -200,25 +200,25 @@ export default function GymLocations() {
               className="glass rounded-[2.5rem] overflow-hidden border border-white/5 group hover:border-cyan-500/30 transition-all flex flex-col sm:flex-row"
             >
               <div className="sm:w-2/5 h-48 sm:h-auto overflow-hidden relative">
-                <img src={loc.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={loc.name} />
+                <img src={loc.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={t(loc.nameKey)} />
                 <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-[#050505]/60 to-transparent" />
               </div>
               
               <div className="sm:w-3/5 p-8 flex flex-col justify-between space-y-6">
                 <div className="space-y-4">
                   <div className="flex flex-wrap gap-2">
-                    {loc.tags.map(tag => (
-                      <span key={tag} className="px-2 py-1 bg-cyan-500/10 text-cyan-400 text-[10px] font-black uppercase tracking-widest rounded-md">
-                        {tag}
+                    {loc.tagKeys.map(tagKey => (
+                      <span key={tagKey} className="px-2 py-1 bg-cyan-500/10 text-cyan-400 text-[10px] font-black uppercase tracking-widest rounded-md">
+                        {t(tagKey)}
                       </span>
                     ))}
                   </div>
-                  <h4 className="text-2xl font-bold">{loc.name}</h4>
+                  <h4 className="text-2xl font-bold">{t(loc.nameKey)}</h4>
                   
                   <div className="space-y-2">
-                    <LocationInfo icon={<MapPin size={14} />} text={loc.address} />
+                    <LocationInfo icon={<MapPin size={14} />} text={t(loc.addressKey)} />
                     <LocationInfo icon={<Phone size={14} />} text={loc.phone} />
-                    <LocationInfo icon={<Clock size={14} />} text={loc.hours} />
+                    <LocationInfo icon={<Clock size={14} />} text={('hoursKey' in loc) ? t(loc.hoursKey as string) : (loc as any).hours} />
                   </div>
                 </div>
 
@@ -263,36 +263,36 @@ export default function GymLocations() {
                 ) : (
                   <div className="flex flex-col md:flex-row">
                     <div className="md:w-1/2 h-64 md:h-auto relative">
-                      <img src={selectedLoc.image} className="w-full h-full object-cover" alt={selectedLoc.name} />
+                      <img src={selectedLoc.image} className="w-full h-full object-cover" alt={t(selectedLoc.nameKey)} />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent md:bg-gradient-to-r" />
                     </div>
 
                     <div className="md:w-1/2 p-8 md:p-12 space-y-8 max-h-[80vh] overflow-y-auto">
                       <div className="space-y-4">
-                        <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">NEO-GYM Location Details</p>
-                        <h3 className="text-4xl font-black italic uppercase">{selectedLoc.name}</h3>
+                        <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase font-bold">{t('locations.detail_meta_title')}</p>
+                        <h3 className="text-4xl font-black italic uppercase">{t(selectedLoc.nameKey)}</h3>
                       </div>
 
                       <div className="space-y-4 text-slate-300 leading-relaxed">
-                        <p className="text-lg font-medium">{selectedLoc.description}</p>
+                        <p className="text-lg font-medium">{t(selectedLoc.descriptionKey)}</p>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-4">
                           <h5 className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{t('locations.contact_info')}</h5>
                           <div className="space-y-3">
-                            <LocationInfo icon={<MapPin size={14} />} text={selectedLoc.address} />
+                            <LocationInfo icon={<MapPin size={14} />} text={t(selectedLoc.addressKey)} />
                             <LocationInfo icon={<Phone size={14} />} text={selectedLoc.phone} />
-                            <LocationInfo icon={<Clock size={14} />} text={selectedLoc.hours} />
+                            <LocationInfo icon={<Clock size={14} />} text={('hoursKey' in selectedLoc) ? t(selectedLoc.hoursKey as string) : (selectedLoc as any).hours} />
                           </div>
                         </div>
                         <div className="space-y-4">
                           <h5 className="text-[10px] uppercase font-black text-slate-500 tracking-widest">{t('locations.facilities')}</h5>
                           <div className="flex flex-wrap gap-2">
-                            {selectedLoc.tags.map(tag => (
-                              <div key={tag} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 rounded-lg border border-white/5 text-[10px] font-bold text-cyan-400">
+                            {selectedLoc.tagKeys.map(tagKey => (
+                              <div key={tagKey} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 rounded-lg border border-white/5 text-[10px] font-bold text-cyan-400">
                                 <CheckCircle2 size={12} />
-                                {tag}
+                                {t(tagKey)}
                               </div>
                             ))}
                           </div>
