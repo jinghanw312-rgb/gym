@@ -3,8 +3,21 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
+
+let aiInstance: GoogleGenAI | null = null;
+function getAI() {
+  if (!aiInstance) {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) {
+      throw new Error("GEMINI_API_KEY environment variable is missing");
+    }
+    aiInstance = new GoogleGenAI({ apiKey: key });
+  }
+  return aiInstance;
+}
 
 async function startServer() {
   const app = express();
@@ -106,6 +119,65 @@ async function startServer() {
     } catch (error) {
       console.error("Failed to submit to Google Sheets:", error);
       res.status(500).json({ error: "資料存入試算表失敗，請聯繫管理員確認 Webhook 設定。" });
+    }
+  });
+
+  // API Route for AI Fitness Assistant
+  app.post("/api/ask-fitness", async (req, res) => {
+    try {
+      const { question, history, language } = req.body;
+      const ai = getAI();
+      const contents = (history || []).map((h: any) => ({
+        role: h.role === 'user' ? 'user' : 'model',
+        parts: [{ text: h.content }]
+      }));
+
+      contents.push({
+        role: 'user',
+        parts: [{ text: question }]
+      });
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: contents,
+        config: {
+          systemInstruction: `你是一位專業的運動與健身教練。請用${language || '繁體中文'}回答使用者的運動相關問題。你的回答應該專業、具備科學依據，且鼓勵使用者保持健康的運動習慣。如果問題與運動、健身、飲食健康不相關，請禮貌地告知使用者你只能回答運動相關的問題。`,
+        },
+      });
+
+      res.json({ text: response.text });
+    } catch (error: any) {
+      console.error("Gemini API Error:", error);
+      res.status(500).json({ error: error.message || "無法連接到 AI 教練，請稍後再試。" });
+    }
+  });
+
+  // API Route for generating workout
+  app.post("/api/generate-workout", async (req, res) => {
+    try {
+      const { goal, equipment, level, language } = req.body;
+      const ai = getAI();
+      const prompt = `請為我設計一份健身菜單。
+目標：${goal}
+可用器材：${(equipment || []).join(', ')}
+程度：${level}
+請用${language || '繁體中文'}回答，格式請包含：
+1. 暖身 (Warm-up)
+2. 正式訓練 (Main Workout) - 每項動作包含組數、次數。
+3. 收操 (Cool-down)`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: {
+          systemInstruction: `你是一位專業的私人健身教練，擅長根據使用者需求設計科學化的訓練課表。你的回覆應該結構清晰，且一律使用${language || '繁體中文'}回答。`,
+        },
+      });
+
+      res.json({ text: response.text });
+    } catch (error: any) {
+      console.error("Gemini API Workout Error:", error);
+      res.status(500).json({ error: error.message || "生成課表失敗，請稍後再試。" });
     }
   });
 
