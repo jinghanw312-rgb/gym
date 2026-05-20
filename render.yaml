@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: neo-gym-fitness
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: RECEIVER_EMAIL
+        value: jinghanw312@gmail.com
+      - key: GOOGLE_SHEET_WEBHOOK_URL
+        sync: false
