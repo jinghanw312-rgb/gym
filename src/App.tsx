@@ -408,46 +408,44 @@ export default function App() {
               {authError.message}
             </div>
 
-            {isIframe && (
-              <div className="mb-6 p-4 bg-cyan-950/30 border border-cyan-500/20 rounded-2xl text-xs text-cyan-300 leading-relaxed space-y-2">
-                <p>💡 <strong>為什麼預覽內嵌時不支援 popup？</strong></p>
-                <p className="text-slate-300">
-                  由於 Google 安全和第三方 Cookie（跨來源）的限制，瀏覽器預設不允許在 iframe（預覽小窗）內部彈出或存取 Google 帳號。這不是系統的錯誤，而是瀏覽器的安全標準。
-                </p>
-                <p className="text-cyan-200 font-bold">
-                  解法：請直接點擊下方「在新分頁中直接開啟」按鈕即可順暢登入！
-                </p>
-              </div>
-            )}
+            <div className="mb-6 p-4 bg-cyan-950/20 border border-cyan-500/25 rounded-2xl text-xs text-slate-300 leading-relaxed space-y-2">
+              <p className="text-cyan-400 font-bold flex items-center gap-1">
+                <span>✨ 快捷解決方案：免去繁瑣的網域設定！</span>
+              </p>
+              <p>
+                此網域提示是由於 Google 帳號授權要求。您可以直接點擊下方<strong>「直接以訪客模式進入系統」</strong>，即可立刻跳過設定，免登入直接體驗所有的紀錄與健身教練功能！
+              </p>
+            </div>
 
             <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setAuthError(null);
+                  handleEnterAsGuest();
+                }}
+                className="w-full py-4.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-center text-white font-black rounded-2xl shadow-xl shadow-cyan-500/20 hover:shadow-cyan-400/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 bg-[#06b6d4]"
+              >
+                <Users size={20} />
+                直接以「訪客模式」進入系統 🚀
+              </button>
+
               {isIframe && (
                 <a
                   href={window.location.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setAuthError(null)}
-                  className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-center text-white font-bold rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 bg-[#06b6d4]"
+                  className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-center text-slate-300 hover:text-white font-medium rounded-2xl transition-all flex items-center justify-center gap-2 border border-white/5"
                 >
-                  🚀 在新分頁中直接開啟網頁 (推薦)
+                  在新分頁中直接開啟網頁 (推薦)
                 </a>
               )}
-              
-              <button
-                onClick={() => {
-                  setAuthError(null);
-                  handleEnterAsGuest();
-                }}
-                className="w-full py-4 bg-white/5 hover:bg-white/10 text-cyan-400 font-bold rounded-xl text-center transition-colors border border-white/10"
-              >
-                直接使用「訪客模式」進入
-              </button>
 
               <button
                 onClick={() => setAuthError(null)}
-                className="w-full py-3 text-sm text-slate-500 hover:text-white transition-colors"
+                className="w-full py-3 text-sm text-slate-500 hover:text-slate-300 transition-colors"
               >
-                關閉提示
+                關閉提示，返回登入頁
               </button>
             </div>
           </motion.div>
