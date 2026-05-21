@@ -299,6 +299,50 @@ export default function App() {
     }
   }, [searchQuery, matchedExerciseKey]);
 
+  const guestUser = {
+    uid: 'local-guest-user',
+    displayName: '極速挑戰者 (訪客)',
+    email: 'guest@neogym.local',
+    emailVerified: false,
+    isAnonymous: true,
+    providerData: []
+  } as any;
+
+  const handleEnterAsGuest = async () => {
+    try {
+      await signInAsGuest();
+      setView('dashboard');
+    } catch (err) {
+      console.warn('Firebase Guest Login failed, falling back to client-side local guest mode:', err);
+      setUser(guestUser);
+      setView('dashboard');
+    }
+  };
+
+  const handlePopupLogin = async () => {
+    try {
+      const res = await signIn();
+      if (res) {
+        setView('dashboard');
+      } else {
+        await handleEnterAsGuest();
+      }
+    } catch (err) {
+      console.warn('Firebase popup login failed, using guest mode:', err);
+      await handleEnterAsGuest();
+    }
+  };
+
+  const handleLogOut = async () => {
+    try {
+      await logOut();
+    } catch (err) {
+      console.warn('Firebase logout failed:', err);
+    }
+    setUser(null);
+    setView('landing');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
@@ -319,30 +363,14 @@ export default function App() {
             if (user) {
               setView('dashboard');
             } else {
-              signIn().then((result) => {
-                if (result) {
-                  setView('dashboard');
-                } else {
-                  signInAsGuest().then(() => setView('dashboard')).catch(console.error);
-                }
-              }).catch((err) => {
-                console.warn('Popup login failed, logging in as guest instead:', err);
-                signInAsGuest().then(() => setView('dashboard')).catch(console.error);
-              });
+              handlePopupLogin();
             }
           }} 
           onStartTracking={() => {
             if (user) {
               setView('dashboard');
             } else {
-              signInAsGuest().then(() => {
-                setView('dashboard');
-              }).catch((err) => {
-                console.warn('Guest login failed, falling back to popup signin:', err);
-                signIn().then((result) => {
-                  if (result) setView('dashboard');
-                }).catch(console.error);
-              });
+              handleEnterAsGuest();
             }
           }} 
         />
@@ -376,7 +404,7 @@ export default function App() {
           
           <div className="flex flex-col gap-4 max-w-sm mx-auto w-full">
             <button 
-              onClick={signIn}
+              onClick={handlePopupLogin}
               className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold uppercase rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-400/40 transition-all hover:scale-105 active:scale-95"
             >
               <LogIn size={22} />
@@ -384,7 +412,7 @@ export default function App() {
             </button>
             
             <button 
-              onClick={() => signInAsGuest().then(() => setView('dashboard'))}
+              onClick={handleEnterAsGuest}
               className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-[#101010] hover:bg-[#151515] border border-white/10 text-cyan-400 hover:text-cyan-300 font-bold uppercase rounded-full shadow-lg hover:border-cyan-500/35 transition-all hover:scale-105 active:scale-95"
             >
               <Users size={22} />
@@ -445,7 +473,7 @@ export default function App() {
               <p className="text-sm font-bold truncate max-w-[150px]">{user.displayName || user.email}</p>
             </div>
             <button 
-              onClick={logOut}
+              onClick={handleLogOut}
               className="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-red-500/20 transition-colors group"
             >
               <LogOut size={18} className="text-slate-400 group-hover:text-red-400" />
