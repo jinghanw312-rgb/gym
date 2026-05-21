@@ -213,6 +213,12 @@ export default function App() {
   const [showObstacleGame, setShowObstacleGame] = useState(false);
   const [logTab, setLogTab] = useState<'sports' | 'games'>('sports');
   const [view, setView] = useState<'landing' | 'dashboard'>('landing');
+  const [authError, setAuthError] = useState<{ code?: string; message: string } | null>(null);
+  const [isIframe, setIsIframe] = useState(false);
+
+  useEffect(() => {
+    setIsIframe(window.self !== window.top);
+  }, []);
   
   // Form State
   const [category, setCategory] = useState<string>(CATEGORIES[0]);
@@ -310,9 +316,10 @@ export default function App() {
 
   const handleEnterAsGuest = async () => {
     try {
+      setAuthError(null);
       await signInAsGuest();
       setView('dashboard');
-    } catch (err) {
+    } catch (err: any) {
       console.warn('Firebase Guest Login failed, falling back to client-side local guest mode:', err);
       setUser(guestUser);
       setView('dashboard');
@@ -321,15 +328,32 @@ export default function App() {
 
   const handlePopupLogin = async () => {
     try {
+      setAuthError(null);
       const res = await signIn();
       if (res) {
         setView('dashboard');
       } else {
-        await handleEnterAsGuest();
+        setAuthError({
+          code: 'closed',
+          message: '已關閉 Google 登入視窗。如果您使用的是預覽環境，這通常是由於您的瀏覽器安全性設定封鎖了來自「iFrame（預覽視窗）」的彈出式視窗與 Third-party Cookies 。'
+        });
       }
-    } catch (err) {
-      console.warn('Firebase popup login failed, using guest mode:', err);
-      await handleEnterAsGuest();
+    } catch (err: any) {
+      console.error('Firebase popup login failed:', err);
+      let message = err.message || String(err);
+      let code = err.code || 'unknown';
+      
+      if (code === 'auth/unauthorized-domain' || message.includes('unauthorized-domain')) {
+        message = '此網域尚未在 Firebase Console 的「已授權網域」設定中。請至 Firebase 主控台 (Authentication > 設定 > 已授權網域) 中新增此網域：' + window.location.hostname;
+      } else if (code === 'auth/popup-blocked' || message.includes('popup-blocked')) {
+        message = '登入視窗已被瀏覽器阻擋（預覽視窗 iframe 限制）。請點擊網頁右上角「在新分頁中開啟 / Open App」，直接在新分頁中操作，即可完美登入您的個人的 Google 帳號！';
+      } else if (code === 'auth/network-request-failed') {
+        message = '網路請求失敗，請確認網際網路連線或更新安全憑證。在 AI Studio 中，我們強烈建議點擊右上角的「在新分頁中開啟」來執行獨立網頁登入，這會繞過所有的 iframe 限制。';
+      } else {
+        message = `登入失敗 (${code})：\n${message}\n\n提示：請點擊網頁右上方的「在新分頁中開啟」按鈕。在新分頁（獨立視窗）中，您可以順利使用個人的 Google 帳號進行登入！`;
+      }
+      
+      setAuthError({ code, message });
     }
   };
 
@@ -342,6 +366,80 @@ export default function App() {
     setUser(null);
     setView('landing');
   };
+
+  const renderAuthErrorModal = () => (
+    <AnimatePresence>
+      {authError && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="w-full max-w-lg bg-slate-900 border border-red-500/30 rounded-3xl p-6 md:p-8 shadow-2xl relative text-left"
+          >
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center shrink-0">
+                <X size={24} className="text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Google 帳號登入辨識</h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  在多網域與預覽環境下安全使用個人 Google 帳號的指引
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-slate-950/60 rounded-2xl p-4 border border-white/5 font-mono text-xs leading-relaxed text-slate-300 whitespace-pre-line mb-6 max-h-48 overflow-y-auto">
+              {authError.message}
+            </div>
+
+            {isIframe && (
+              <div className="mb-6 p-4 bg-cyan-950/30 border border-cyan-500/20 rounded-2xl text-xs text-cyan-300 leading-relaxed space-y-2">
+                <p>💡 <strong>為什麼預覽內嵌時不支援 popup？</strong></p>
+                <p className="text-slate-300">
+                  由於 Google 安全和第三方 Cookie（跨來源）的限制，瀏覽器預設不允許在 iframe（預覽小窗）內部彈出或存取 Google 帳號。這不是系統的錯誤，而是瀏覽器的安全標準。
+                </p>
+                <p className="text-cyan-200 font-bold">
+                  解法：請直接點擊下方「在新分頁中直接開啟」按鈕即可順暢登入！
+                </p>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3">
+              {isIframe && (
+                <a
+                  href={window.location.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setAuthError(null)}
+                  className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-605 text-center text-white font-bold rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 bg-[#06b6d4]"
+                >
+                  🚀 在新分頁中直接開啟網頁 (推薦)
+                </a>
+              )}
+              
+              <button
+                onClick={() => {
+                  setAuthError(null);
+                  handleEnterAsGuest();
+                }}
+                className="w-full py-4 bg-white/5 hover:bg-white/10 text-cyan-400 font-bold rounded-xl text-center transition-colors border border-white/10"
+              >
+                直接使用「訪客模式」進入
+              </button>
+
+              <button
+                onClick={() => setAuthError(null)}
+                className="w-full py-3 text-sm text-slate-500 hover:text-white transition-colors"
+              >
+                關閉提示
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
 
   if (loading) {
     return (
@@ -370,11 +468,12 @@ export default function App() {
             if (user) {
               setView('dashboard');
             } else {
-              handleEnterAsGuest();
+              handlePopupLogin(); // Let them log in when clicking Start Tracking as they want Google!
             }
           }} 
         />
         <AIAssistant />
+        {renderAuthErrorModal()}
       </>
     );
   }
@@ -386,7 +485,7 @@ export default function App() {
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-center space-y-12 z-10"
+          className="text-center space-y-12 z-10 w-full max-w-md"
         >
           <div className="space-y-4">
             <div className="w-24 h-24 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-cyan-500/30">
@@ -402,13 +501,28 @@ export default function App() {
             </div>
           </div>
           
+          {isIframe && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-5 bg-cyan-950/40 border border-cyan-500/20 text-cyan-300 rounded-2xl text-xs space-y-2 text-center leading-relaxed"
+            >
+              <p className="font-bold">⚠️ 偵測到您在預覽視窗（iFrame）中</p>
+              <p className="text-slate-400">
+                Google 帳號安全性高，不支援在內嵌視窗中做 Google 授權彈出。
+                請直接點選上方<strong>「在新分頁開啟 / Open App」</strong>按鈕。
+                直接使用新分頁，個人的 Google 登入就絕對可以完美執行囉！
+              </p>
+            </motion.div>
+          )}
+
           <div className="flex flex-col gap-4 max-w-sm mx-auto w-full">
             <button 
               onClick={handlePopupLogin}
               className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold uppercase rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-400/40 transition-all hover:scale-105 active:scale-95"
             >
               <LogIn size={22} />
-              登入會員系統
+              登入個人的 Google 帳號
             </button>
             
             <button 
@@ -427,6 +541,7 @@ export default function App() {
             </button>
           </div>
         </motion.div>
+        {renderAuthErrorModal()}
       </div>
     );
   }
@@ -949,6 +1064,7 @@ export default function App() {
       </AnimatePresence>
       
       <AIAssistant />
+      {renderAuthErrorModal()}
     </div>
   );
 }
