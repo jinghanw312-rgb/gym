@@ -20,10 +20,11 @@ import {
   Award,
   Crosshair,
   Edit3,
-  X
+  X,
+  Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { auth, signIn, logOut } from './lib/firebase';
+import { auth, signIn, signInAsGuest, logOut } from './lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { saveRecord, subscribeToLogs, deleteRecord, SportsLog } from './services/sportsService';
 import { format } from 'date-fns';
@@ -315,16 +316,34 @@ export default function App() {
       <>
         <LandingPage 
           onLogin={() => {
-            if (user) setView('dashboard');
-            else signIn().then((result) => {
-              if (result) setView('dashboard');
-            });
+            if (user) {
+              setView('dashboard');
+            } else {
+              signIn().then((result) => {
+                if (result) {
+                  setView('dashboard');
+                } else {
+                  signInAsGuest().then(() => setView('dashboard')).catch(console.error);
+                }
+              }).catch((err) => {
+                console.warn('Popup login failed, logging in as guest instead:', err);
+                signInAsGuest().then(() => setView('dashboard')).catch(console.error);
+              });
+            }
           }} 
           onStartTracking={() => {
-            if (user) setView('dashboard');
-            else signIn().then((result) => {
-              if (result) setView('dashboard');
-            });
+            if (user) {
+              setView('dashboard');
+            } else {
+              signInAsGuest().then(() => {
+                setView('dashboard');
+              }).catch((err) => {
+                console.warn('Guest login failed, falling back to popup signin:', err);
+                signIn().then((result) => {
+                  if (result) setView('dashboard');
+                }).catch(console.error);
+              });
+            }
           }} 
         />
         <AIAssistant />
@@ -355,17 +374,26 @@ export default function App() {
             </div>
           </div>
           
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 max-w-sm mx-auto w-full">
             <button 
               onClick={signIn}
-              className="group relative inline-flex items-center gap-4 px-12 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold uppercase rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-400/40 transition-all hover:scale-105 active:scale-95"
+              className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold uppercase rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-400/40 transition-all hover:scale-105 active:scale-95"
             >
               <LogIn size={22} />
               登入會員系統
             </button>
+            
+            <button 
+              onClick={() => signInAsGuest().then(() => setView('dashboard'))}
+              className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-[#101010] hover:bg-[#151515] border border-white/10 text-cyan-400 hover:text-cyan-300 font-bold uppercase rounded-full shadow-lg hover:border-cyan-500/35 transition-all hover:scale-105 active:scale-95"
+            >
+              <Users size={22} />
+              訪客免登入體驗
+            </button>
+
             <button 
               onClick={() => setView('landing')}
-              className="text-slate-500 hover:text-white font-bold uppercase tracking-widest text-xs transition-colors"
+              className="text-slate-500 hover:text-white font-bold uppercase tracking-widest text-xs transition-colors mt-4"
             >
               回首頁
             </button>
