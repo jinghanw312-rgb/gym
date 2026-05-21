@@ -229,11 +229,26 @@ export default function App() {
   const [score, setScore] = useState('');
 
   useEffect(() => {
+    // Safety fallback timer: if Firebase auth blocks or delays, force loading to end so the landing page can render
+    const fallbackTimer = setTimeout(() => {
+      console.warn("Firebase Auth subscription timed out, forcing presentation of Landing Page.");
+      setLoading(false);
+    }, 3500);
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      clearTimeout(fallbackTimer);
       setUser(currentUser);
       setLoading(false);
+    }, (error) => {
+      console.error("Firebase Auth state error:", error);
+      clearTimeout(fallbackTimer);
+      setLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => {
+      clearTimeout(fallbackTimer);
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
