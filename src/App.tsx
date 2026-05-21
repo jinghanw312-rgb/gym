@@ -434,6 +434,16 @@ export default function App() {
               )}
               
               <button
+                onClick={() => {
+                  setAuthError(null);
+                  handleEnterAsGuest();
+                }}
+                className="w-full py-4 bg-white/5 hover:bg-white/10 text-cyan-400 font-bold rounded-xl text-center transition-colors border border-white/10"
+              >
+                直接使用「訪客模式」進入
+              </button>
+
+              <button
                 onClick={() => setAuthError(null)}
                 className="w-full py-3 text-sm text-slate-500 hover:text-white transition-colors"
               >
@@ -463,18 +473,10 @@ export default function App() {
       <>
         <LandingPage 
           onLogin={() => {
-            if (user) {
-              setView('dashboard');
-            } else {
-              handlePopupLogin();
-            }
+            setView('dashboard');
           }} 
           onStartTracking={() => {
-            if (user) {
-              setView('dashboard');
-            } else {
-              handlePopupLogin(); // Let them log in when clicking Start Tracking as they want Google!
-            }
+            setView('dashboard');
           }} 
         />
         <AIAssistant />
@@ -528,6 +530,14 @@ export default function App() {
             >
               <LogIn size={22} />
               登入個人的 Google 帳號
+            </button>
+
+            <button 
+              onClick={handleEnterAsGuest}
+              className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-[#101010] hover:bg-[#151515] border border-white/10 text-cyan-400 hover:text-cyan-300 font-bold uppercase rounded-full shadow-lg hover:border-cyan-500/35 transition-all hover:scale-105 active:scale-95"
+            >
+              <Users size={22} />
+              訪客免登入體驗
             </button>
             
             <button 
