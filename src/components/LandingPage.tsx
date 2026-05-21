@@ -615,7 +615,7 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
                     <Instagram size={20} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Instagram ({t('social.coach')} 1)</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Instagram ({t('social.secretary1')})</p>
                     <p className="text-sm font-bold">@heyitsxyc</p>
                   </div>
                 </a>
@@ -629,7 +629,7 @@ export default function LandingPage({ onStartTracking, onLogin }: LandingPagePro
                     <Instagram size={20} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Instagram ({t('social.coach')} 2)</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Instagram ({t('social.secretary2')})</p>
                     <p className="text-sm font-bold">@yushan__07</p>
                   </div>
                 </a>
