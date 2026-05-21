@@ -412,22 +412,12 @@ export default function App() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setAuthError(null)}
-                  className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-605 text-center text-white font-bold rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 bg-[#06b6d4]"
+                  className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-center text-white font-bold rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 bg-[#06b6d4]"
                 >
                   🚀 在新分頁中直接開啟網頁 (推薦)
                 </a>
               )}
               
-              <button
-                onClick={() => {
-                  setAuthError(null);
-                  handleEnterAsGuest();
-                }}
-                className="w-full py-4 bg-white/5 hover:bg-white/10 text-cyan-400 font-bold rounded-xl text-center transition-colors border border-white/10"
-              >
-                直接使用「訪客模式」進入
-              </button>
-
               <button
                 onClick={() => setAuthError(null)}
                 className="w-full py-3 text-sm text-slate-500 hover:text-white transition-colors"
@@ -525,14 +515,6 @@ export default function App() {
               登入個人的 Google 帳號
             </button>
             
-            <button 
-              onClick={handleEnterAsGuest}
-              className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-[#101010] hover:bg-[#151515] border border-white/10 text-cyan-400 hover:text-cyan-300 font-bold uppercase rounded-full shadow-lg hover:border-cyan-500/35 transition-all hover:scale-105 active:scale-95"
-            >
-              <Users size={22} />
-              訪客免登入體驗
-            </button>
-
             <button 
               onClick={() => setView('landing')}
               className="text-slate-500 hover:text-white font-bold uppercase tracking-widest text-xs transition-colors mt-4"
