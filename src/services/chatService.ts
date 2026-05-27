@@ -59,6 +59,29 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   throw new Error(JSON.stringify(errInfo));
 }
 
+const getLocalChat = (): ChatMessage[] => {
+  try {
+    const raw = localStorage.getItem('neogym_local_chat');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return parsed.map((item: any) => ({
+      ...item,
+      timestamp: item.timestamp ? new Date(item.timestamp) : new Date()
+    }));
+  } catch (e) {
+    console.error('Error fetching local chat:', e);
+    return [];
+  }
+};
+
+const saveLocalChat = (messages: ChatMessage[]) => {
+  try {
+    localStorage.setItem('neogym_local_chat', JSON.stringify(messages));
+  } catch (e) {
+    console.error('Error saving local chat:', e);
+  }
+};
+
 export interface ChatMessage {
   id?: string;
   userId: string;
@@ -68,6 +91,21 @@ export interface ChatMessage {
 }
 
 export const sendMessage = async (userId: string, role: 'user' | 'assistant', content: string) => {
+  if (userId === 'local-guest-user') {
+    const localChat = getLocalChat();
+    const newMsg: ChatMessage = {
+      id: 'local-msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+      role,
+      content,
+      userId,
+      timestamp: new Date()
+    };
+    localChat.push(newMsg);
+    saveLocalChat(localChat);
+    window.dispatchEvent(new Event('local-chat-updated'));
+    return;
+  }
+
   const path = `users/${userId}/chatHistory`;
   try {
     const chatRef = collection(db, 'users', userId, 'chatHistory');
@@ -83,6 +121,18 @@ export const sendMessage = async (userId: string, role: 'user' | 'assistant', co
 };
 
 export const subscribeToChat = (userId: string, callback: (messages: ChatMessage[]) => void) => {
+  if (userId === 'local-guest-user') {
+    callback(getLocalChat());
+
+    const handleUpdate = () => {
+      callback(getLocalChat());
+    };
+    window.addEventListener('local-chat-updated', handleUpdate);
+    return () => {
+      window.removeEventListener('local-chat-updated', handleUpdate);
+    };
+  }
+
   const path = `users/${userId}/chatHistory`;
   const chatRef = collection(db, 'users', userId, 'chatHistory');
   const q = query(chatRef, orderBy('timestamp', 'asc'));
@@ -99,6 +149,12 @@ export const subscribeToChat = (userId: string, callback: (messages: ChatMessage
 };
 
 export const clearChat = async (userId: string) => {
+  if (userId === 'local-guest-user') {
+    saveLocalChat([]);
+    window.dispatchEvent(new Event('local-chat-updated'));
+    return;
+  }
+
   const path = `users/${userId}/chatHistory`;
   try {
     const chatRef = collection(db, 'users', userId, 'chatHistory');

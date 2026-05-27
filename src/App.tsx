@@ -330,15 +330,9 @@ export default function App() {
   } as any;
 
   const handleEnterAsGuest = async () => {
-    try {
-      setAuthError(null);
-      await signInAsGuest();
-      setView('dashboard');
-    } catch (err: any) {
-      console.warn('Firebase Guest Login failed, falling back to client-side local guest mode:', err);
-      setUser(guestUser);
-      setView('dashboard');
-    }
+    setAuthError(null);
+    setUser(guestUser);
+    setView('dashboard');
   };
 
   const handlePopupLogin = async () => {
