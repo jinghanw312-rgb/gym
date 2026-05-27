@@ -465,10 +465,10 @@ export default function App() {
       <>
         <LandingPage 
           onLogin={() => {
-            setView('dashboard');
+            handleEnterAsGuest();
           }} 
           onStartTracking={() => {
-            setView('dashboard');
+            handleEnterAsGuest();
           }} 
         />
         <AIAssistant />
@@ -499,37 +499,14 @@ export default function App() {
               </p>
             </div>
           </div>
-          
-          {isIframe && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-5 bg-cyan-950/40 border border-cyan-500/20 text-cyan-300 rounded-2xl text-xs space-y-2 text-center leading-relaxed"
-            >
-              <p className="font-bold">⚠️ 偵測到您在預覽視窗（iFrame）中</p>
-              <p className="text-slate-400">
-                Google 帳號安全性高，不支援在內嵌視窗中做 Google 授權彈出。
-                請直接點選上方<strong>「在新分頁開啟 / Open App」</strong>按鈕。
-                直接使用新分頁，個人的 Google 登入就絕對可以完美執行囉！
-              </p>
-            </motion.div>
-          )}
 
           <div className="flex flex-col gap-4 max-w-sm mx-auto w-full">
             <button 
-              onClick={handlePopupLogin}
-              className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold uppercase rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-400/40 transition-all hover:scale-105 active:scale-95"
-            >
-              <LogIn size={22} />
-              登入個人的 Google 帳號
-            </button>
-
-            <button 
               onClick={handleEnterAsGuest}
-              className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-[#101010] hover:bg-[#151515] border border-white/10 text-cyan-400 hover:text-cyan-300 font-bold uppercase rounded-full shadow-lg hover:border-cyan-500/35 transition-all hover:scale-105 active:scale-95"
+              className="group relative inline-flex items-center justify-center gap-4 px-12 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 border border-white/10 text-white font-bold uppercase rounded-full shadow-lg shadow-cyan-500/20 hover:shadow-cyan-400/40 transition-all hover:scale-105 active:scale-95"
             >
               <Users size={22} />
-              訪客免登入體驗
+              直接以訪客模式進入體驗
             </button>
             
             <button 
